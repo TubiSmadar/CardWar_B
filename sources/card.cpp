@@ -1,36 +1,5 @@
-//#include "Card.hpp"
-//#include <iostream>
-//using namespace std;
-//
-//using namespace ariel;
-//    class Card{
-//        private:
-//            Rank val;
-//            Suit shape;
-//        public:
-//
-//            Card(Rank val, Suit shape){
-//                this->val = val;
-//                this->shape = shape;
-//            }
-//            void setVal(Rank val){
-//                this->val = val;
-//            }
-//            Rank getVal(){
-//                return val;
-//            }
-//            Suit getShape(){
-//                return shape;
-//            }
-//            void setShape(Suit shape){
-//                this->shape = shape;
-//            }
-//            void showCard(){
-//                std::printf(&"Your card is " [ val] + " of " + shape);
-//            }
-//    };
 
-#include "Card.hpp"
+#include "card.hpp"
 #include <sstream>
 
 using namespace std;
@@ -38,15 +7,15 @@ using namespace std;
 namespace ariel
 {
 
-    Card::Card() : rank(Rank::NO_RANK), suit(Suit::HEARTS) {}
+    card::card() : rank(Rank::NO_RANK), suit(Suit::HEARTS) {}
 
-    Card::Card(Rank rank, Suit suit) : rank(rank), suit(suit) {}
+    card::card(Rank rank, Suit suit) : rank(rank), suit(suit) {}
 
-    Card::Card(const Card &other) noexcept : rank(other.rank), suit(other.suit) {}
+    card::card(const card &other) noexcept : rank(other.rank), suit(other.suit) {}
 
-    Card::Card(Card &&other) noexcept : rank(other.rank), suit(other.suit) {}
+    card::card(card &&other) noexcept : rank(other.rank), suit(other.suit) {}
 
-    Card &Card::operator=(const Card &other) noexcept
+    card &card::operator=(const card &other) noexcept
             {
                 if (this != &other)
                     {
@@ -58,7 +27,7 @@ namespace ariel
 
 
 
-    Card &Card::operator=(Card &&other) noexcept
+    card &card::operator=(card &&other) noexcept
         {
             if (this != &other)
                 {
@@ -68,10 +37,10 @@ namespace ariel
             return *this;
         }
 
-    Card::~Card() {}
+    card::~card() {}
 
 
-int Card::compare(const Card &other) const
+int card::compare(const card &other) const
 {
     if (rank == Rank::ACE && other.rank != Rank::ACE)
     {
@@ -104,7 +73,7 @@ int Card::compare(const Card &other) const
 }
 
 // Used GPT for this representation
-std::string Card::toString() const
+std::string card::toString() const
 {
     std::stringstream ss;
     std::string rank_str, suit_str;
