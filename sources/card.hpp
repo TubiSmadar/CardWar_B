@@ -30,13 +30,13 @@
 //        CLUBS
 //    };
 //
-//    class Card{
+//    class card{
 //        private:
 //            Rank val;
 //            Suit shape;
 //
 //        public:
-//            Card(int val, std::string shape);
+//            card(int val, std::string shape);
 //            void setVal(int val);
 //            int getVal();
 //            std::string getShape();
@@ -80,34 +80,26 @@ namespace ariel
         CLUBS
     };
 
-    class Card
+    class card
     {
     public:
-        Card();
+        card();
 
         //Constructor
-        Card(Rank rank, Suit suit);
-
-        //Copy constructor
-        Card(const Card &other) noexcept;
-
-        //Move constructor
-        Card(Card &&other) noexcept;
-
-        //Copy assignment operator
-        Card &operator=(const Card &other) noexcept;
-
-        //Move assignment operator
-        Card &operator=(Card &&other) noexcept;
+        card(Rank rank, Suit suit);
+        card(const card &other) noexcept;
+        card(card &&other) noexcept;
+        card &operator=(const card &other) noexcept;
+        card &operator=(card &&other) noexcept;
 
         //Destructor
-        ~Card();
+        ~card();
 
         //Returns a string representation of the card
         std::string toString() const;
 
         //Compare method
-        int compare(const Card &other) const;
+        int compare(const card &other) const;
 
         //Getters
         Rank getRank() const { return rank; }
@@ -117,7 +109,6 @@ namespace ariel
         void setRank(Rank rank) { this->rank = rank; }
         void setSuit(Suit suit) { this->suit = suit; }
 
-        //Static methods
         static std::string suitToString(Suit suit);
         static std::string rankToString(Rank rank);
 
