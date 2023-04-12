@@ -1,32 +1,6 @@
-//#ifndef PLAYER_H
-//#define PLAYER_H
-//
-//#include <string>
-//#include <iostream>
-//#include "Card.hpp"
-//#include <stack>
-//
-//
-//using namespace std;
-//namespace ariel{
-//    class Player{
-//        private:
-//            std::string name;
-//            std::vector<card> stack;
-//            std::Integer stack_size;
-//            std::Integer cards_taken;
-//
-//        public:
-//            Player(std::string name);
-//
-//            int cardesTaken();
-//            int stacksize();
-//    };
-//}
-//#endif
 
-#ifndef WAR_PLAYER_H
-#define WAR_PLAYER_H
+#ifndef PLAYER_H
+#define PLAYER_H
 
 #include <string>
 #include <vector>
@@ -46,24 +20,25 @@ namespace ariel
         int turnsDraw = 0;
     };
 
-    class Player
+    class player
     {
     private:
-        std::vector<Card> deck;
-        std::vector<Card> taken_cards;
+        std::vector<card> cards_stack;
+        std::vector<card> cards_taken;
         PlayerStats stats;
         std::string name;
         int cards_num = 0;
 
+
     public:
         // default constructor
-        Player() = default;
-        Player(const Player &other);
-        Player &operator=(const Player &other);
-        Player(std::string name);
-        void addCard(const Card &card);
-        void addTakenCard(const Card &card);
-        Card playCard();
+        player() = default;
+        player(const player &other);
+        player &operator=(const player &other);
+        player(std::string name);
+        void addCard(const card &card);
+        void addTakenCard(const card &card);
+        card playCard();
         int cardsLeft() const; // return the number of cards in the player's deck
         std::string getName() const;
         void addTurnWon();
@@ -78,13 +53,13 @@ namespace ariel
         //print cards_stack
         void printCardsStack() const;
         //destructor
-        ~Player();
+        ~player();
 
         //Move constructor
-        Player(Player &&other) noexcept;
+        player(player &&other) noexcept;
 
         //Move assignment operator
-        Player &operator=(Player &&other) noexcept;
+        player &operator=(player &&other) noexcept;
     };
 }
 
