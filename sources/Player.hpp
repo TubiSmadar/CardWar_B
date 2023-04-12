@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "card.hpp"
+#include "Card.hpp"
 
 namespace ariel
 {
@@ -20,11 +20,11 @@ namespace ariel
         int turnsDraw = 0;
     };
 
-    class player
+    class Player
     {
     private:
-        std::vector<card> cards_stack;
-        std::vector<card> cards_taken;
+        std::vector<Card> cards_stack;
+        std::vector<Card> cards_taken;
         PlayerStats stats;
         std::string name;
         int cards_num = 0;
@@ -32,14 +32,14 @@ namespace ariel
 
     public:
         // default constructor
-        player() = default;
-        player(const player &other);
-        player &operator=(const player &other);
-        player(std::string name);
-        void addCard(const card &card);
-        void addTakenCard(const card &card);
-        card playCard();
-        int cardsLeft() const; // return the number of cards in the player's deck
+        Player() = default;
+        Player(const Player &other);
+        Player &operator=(const Player &other);
+        Player(std::string name);
+        void addCard(const Card &card);
+        void addTakenCard(const Card &card);
+        Card playCard();
+        int cardsLeft() const; // return the number of cards in the Player's deck
         std::string getName() const;
         void addTurnWon();
         void addTurnLost();
@@ -53,13 +53,13 @@ namespace ariel
         //print cards_stack
         void printCardsStack() const;
         //destructor
-        ~player();
+        ~Player();
 
         //Move constructor
-        player(player &&other) noexcept;
+        Player(Player &&other) noexcept;
 
         //Move assignment operator
-        player &operator=(player &&other) noexcept;
+        Player &operator=(Player &&other) noexcept;
     };
 }
 
