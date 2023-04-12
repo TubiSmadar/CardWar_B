@@ -1,5 +1,5 @@
 
-#include "card.hpp"
+#include "Card.hpp"
 #include <sstream>
 
 using namespace std;
@@ -7,15 +7,15 @@ using namespace std;
 namespace ariel
 {
 
-    card::card() : rank(Rank::NO_RANK), suit(Suit::HEARTS) {}
+    Card::Card() : rank(Rank::NO_RANK), suit(Suit::HEARTS) {}
 
-    card::card(Rank rank, Suit suit) : rank(rank), suit(suit) {}
+    Card::Card(Rank rank, Suit suit) : rank(rank), suit(suit) {}
 
-    card::card(const card &other) noexcept : rank(other.rank), suit(other.suit) {}
+    Card::Card(const Card &other) noexcept : rank(other.rank), suit(other.suit) {}
 
-    card::card(card &&other) noexcept : rank(other.rank), suit(other.suit) {}
+    Card::Card(Card &&other) noexcept : rank(other.rank), suit(other.suit) {}
 
-    card &card::operator=(const card &other) noexcept
+    Card &Card::operator=(const Card &other) noexcept
             {
                 if (this != &other)
                     {
@@ -27,7 +27,7 @@ namespace ariel
 
 
 
-    card &card::operator=(card &&other) noexcept
+    Card &Card::operator=(Card &&other) noexcept
         {
             if (this != &other)
                 {
@@ -37,10 +37,10 @@ namespace ariel
             return *this;
         }
 
-    card::~card() {}
+    Card::~Card() {}
 
 
-int card::compare(const card &other) const
+int Card::compare(const Card &other) const
 {
     if (rank == Rank::ACE && other.rank != Rank::ACE)
     {
@@ -73,7 +73,7 @@ int card::compare(const card &other) const
 }
 
 // Used GPT for this representation
-std::string card::toString() const
+std::string Card::toString() const
 {
     std::stringstream ss;
     std::string rank_str, suit_str;
