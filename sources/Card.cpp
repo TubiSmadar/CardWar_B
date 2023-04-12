@@ -1,4 +1,3 @@
-
 #include "Card.hpp"
 #include <sstream>
 
@@ -73,7 +72,7 @@ int Card::compare(const Card &other) const
 }
 
 // Used GPT for this representation
-std::string Card::toString() const
+    std::string Card::toString() const
 {
     std::stringstream ss;
     std::string rank_str, suit_str;
