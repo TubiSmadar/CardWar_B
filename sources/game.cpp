@@ -1,42 +1,3 @@
-//#include "Game.hpp"
-//#include <iostream>
-//using namespace std;
-//namespace ariel {
-//
-//    Game::Game(Player& p1, Player& p2) : p1(p1), p2(p2) {
-//        std::cout << "Game constructor called" << std::endl;
-//
-//    }
-//
-//    Game::~Game() {
-//        std::cout << "Game destructor called" << std::endl;
-//    }
-//
-//    void Game::playTurn() {
-//        // Method implementation goes here
-//    }
-//
-//    void Game::printLastTurn() {
-//        // Method implementation goes here
-//    }
-//
-//    void Game::playAll() {
-//        // Method implementation goes here
-//    }
-//
-//    void Game::printWiner() {
-//        // Method implementation goes here
-//    }
-//
-//    void Game::printLog() {
-//        // Method implementation goes here
-//    }
-//
-//    void Game::printStats() {
-//        // Method implementation goes here
-//    }
-//
-//} // namespace ariel
 #include "card.hpp"
 #include "player.hpp"
 #include <algorithm>
@@ -55,8 +16,7 @@ namespace ariel
 {
     // constructors:
 
-    // First constructor - by players:
-    Game::Game(Player &first_player, Player &second_player) : winner(-1), player1(first_player), player2(second_player)
+    game::game(player &first_player, player &second_player) : winner(-1), player1(first_player), player2(second_player)
     {
 
         this->roundsPlayed = 0;
@@ -69,39 +29,36 @@ namespace ariel
             {
                 Suit cardSuit = static_cast<Suit>(suit);
                 Rank cardRank = static_cast<Rank>(rank);
-                Card card(cardRank, cardSuit);
-                middle_stack.push_back(card);
+                card card(cardRank, cardSuit);
+                board_stack.push_back(card);
             }
         }
-
         // shuffle
-
-        cout << "Shuffling the cards...\n"
+        cout << "Shuffling the cards...\n";
 
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::shuffle(std::begin(middle_stack), std::end(middle_stack), gen);
+        std::shuffle(std::begin(board_stack), std::end(board_stack), gen);
 
-        cout << "Dealing the cards...\n"
+        cout << "Dealing the cards...\n";
 
         // split cards
         players[0] = &first_player;
         players[1] = &second_player;
-        for (size_t i = 0; i < middle_stack.size(); i += 2)
+        for (size_t i = 0; i < board_stack.size(); i += 2)
         {
-            players[0]->addCard(middle_stack[i]);
-            players[1]->addCard(middle_stack[i + 1]);
+            players[0]->addCard(board_stack[i]);
+            players[1]->addCard(board_stack[i + 1]);
         }
         // clear the middle stack
-        middle_stack.clear();
-        cout << "--------------------  The game is ready  ------------------------\n"
+        board_stack.clear();
+        cout << "--------------------  The game is ready  ------------------------\n";
     }
 
-    //  default constructor
-    Game::Game() : winner(-1), player1(*new Player("player1")), player2(*new Player("player2")) {}
+    game::game() : winner(-1), player1(*new player("player1")), player2(*new player("player2")) {}
 
     // move assignment operator (rvalue reference)
-    Game &Game::operator=(Game &&other) noexcept
+    game &game::operator=(game &&other) noexcept
 {
     if (this != &other)
 {
@@ -115,9 +72,8 @@ namespace ariel
 }
 return *this;
 }
-// Move constructor
-Game::Game(Game &&other) noexcept
-: board_stack(std::move(other.middle_stack)),
+game::game(game &&other) noexcept
+: board_stack(std::move(other.board_stack)),
 players(std::move(other.players)),
 player1(other.player1),
 player2(other.player2),
@@ -127,8 +83,7 @@ winner(other.winner),
 roundsPlayed(other.roundsPlayed)
 {
 }
-// Copy constructor
-Game::Game(const Game &other)
+game::game(const game &other)
         : board_stack(other.board_stack),
           player1(*other.players[0]),
           player2(*other.players[1]),
@@ -139,8 +94,7 @@ Game::Game(const Game &other)
 {
     players = {&player1, &player2};
 }
-// Copy assignment operator
-Game &Game::operator=(const Game &other)
+game &game::operator=(const game &other)
 {
     if (this != &other)
     {
@@ -157,23 +111,23 @@ Game &Game::operator=(const Game &other)
 }
 
 // destructor:
-Game::~Game() {}
+game::~game() {}
 
-// creating the cards and filling the middle_stack
-void Game::fillCards()
+// creating the cards and filling the board_stack
+void game::fillCards()
 {
     for (int rank = 1; rank <= 13; rank++)
     {
         for (int suit = 0; suit < 4; suit++)
         {
-            Card card(static_cast<Rank>(rank), static_cast<Suit>(suit));
+            card card(static_cast<Rank>(rank), static_cast<Suit>(suit));
             board_stack.push_back(card);
         }
     }
 }
 
 // shuffling the cards:
-void Game::shuffleDeck()
+void game::shuffleDeck()
 {
 
     random_device rd;
@@ -182,7 +136,7 @@ void Game::shuffleDeck()
 }
 
 // splitting the cards between the players:
-void Game::splitCards()
+void game::splitCards()
 {
     for (unsigned int i = 0; i < 52; i++)
     {
@@ -196,11 +150,11 @@ void Game::splitCards()
         }
     }
 }
-void Game::playAll()
+void game::playAll()
 
 {
     std::cout << "Each player has: " << player1.stacksize() << " cards" << std::endl;
-    std::cout << "In the middle stack there are:  " << board_stack.size() << " cards" << std::endl;
+    std::cout << "In the board stack there are:  " << board_stack.size() << " cards" << std::endl;
     while (winner == -1 && roundsPlayed < 27)
     {
 
@@ -211,7 +165,7 @@ void Game::playAll()
 }
 
 // playing a turn:
-void Game::playTurn()
+void game::playTurn()
 
 {
 
@@ -224,7 +178,7 @@ void Game::playTurn()
 
     // print the turn number
     std::cout << "Turn number: " << roundsPlayed << std::endl;
-    std::cout << "\n"
+    std::cout << "\n";
     checkWin();
 
     // every player put in the board stack the card
@@ -233,7 +187,10 @@ void Game::playTurn()
 
     // print the cards
     std::cout << player1.getName() << " card:   " << player2.getName() << " card: " << std::endl;
-    std::cout << Card::toStringTwo(board_stack[board_stack.size() - 2], board_stack[board_stack.size() - 1]) << std::endl;
+    //    std::cout << card::toStringTwo(board_stack[board_stack.size() - 2], board_stack[board_stack.size() - 1]) << std::endl;
+
+
+
 
     // compare the cards - who wins the turn
     if (board_stack[board_stack.size() - 2].compare(board_stack[board_stack.size() - 1]) > 0) // player1 wins
@@ -319,11 +276,6 @@ void Game::playTurn()
                 board_stack.push_back(player2.playCard());
             }
 
-            // print the the last two cards
-            std::cout << player1.getName() << " card:   " << player2.getName() << " card: " << std::endl;
-            std::cout << "The last two open cards are:" << std::endl;
-            std::cout << Card::toStringTwo(board_stack[board_stack.size() - 2], board_stack[board_stack.size() - 1]) << std::endl
-                      << std::endl;
 
             // compare the cards - who wins the turn
             // if player1 wins
@@ -336,11 +288,11 @@ void Game::playTurn()
 
                 for (int i = 0; i < board_stack.size(); i++)
                 {
-                    player1.addTakenCard(board_stack[static_cast<std::vector<Card>::size_type>(i)]);
+                    player1.addTakenCard(board_stack[static_cast<std::vector<card>::size_type>(i)]);
                 }
 
                 board_stack.clear();
-                mainLog += player1.getName() + " played " + board_stack[middle_stack.size() - 2].toString() + "\n" + player2.getName() + " played " + board_stack[middle_stack.size() - 1].toString() + " - " + player1.getName() + " won the turn" + "\n\n";
+                mainLog += player1.getName() + " played " + board_stack[board_stack.size() - 2].toString() + "\n" + player2.getName() + " played " + board_stack[board_stack.size() - 1].toString() + " - " + player1.getName() + " won the turn" + "\n\n";
 
                 checkWin();
                 break;
@@ -356,7 +308,7 @@ void Game::playTurn()
 
                 for (int i = 0; i < board_stack.size(); i++)
                 {
-                    player2.addTakenCard(board_stack[static_cast<std::vector<Card>::size_type>(i)]);
+                    player2.addTakenCard(board_stack[static_cast<std::vector<card>::size_type>(i)]);
                 }
                 board_stack.clear();
                 mainLog += player1.getName() + " played " + board_stack[board_stack.size() - 2].toString() + "\n" + player2.getName() + " played " + board_stack[board_stack.size() - 1].toString() + " - " + player2.getName() + " won the turn" + "\n\n";
@@ -385,7 +337,7 @@ void Game::playTurn()
         }
     }
 }
-void Game::printLastTurn()
+void game::printLastTurn()
 {
     if (roundsPlayed == 0)
     {
@@ -398,7 +350,7 @@ void Game::printLastTurn()
         cout << lastTurn << endl;
     }
 }
-void Game::printWiner()
+void game::printWiner()
 {
     if (player1.stacksize() == 0 || player2.stacksize() == 0 || roundsPlayed == 26)
     {
@@ -426,7 +378,7 @@ void Game::printWiner()
 }
 
 // printing the log:
-void Game::printLog()
+void game::printLog()
 {
     if (mainLog.empty())
     {
@@ -440,7 +392,7 @@ void Game::printLog()
 }
 
 // Member function to get the winner
-const Player &Game::getWinner() const
+const player &game::getWinner() const
 {
     if (winner == 1)
     {
@@ -456,7 +408,7 @@ const Player &Game::getWinner() const
     }
 }
 
-void Game::printStats()
+void game::printStats()
 {
 
     const int NUM_PLAYERS = 2;
@@ -485,7 +437,7 @@ void Game::printStats()
     cout << "Players played: " << endl;
     for (int i = 0; i < NUM_PLAYERS; i++)
     {
-        Player player = (i == 0) ? player1 : player2;
+        player player = (i == 0) ? player1 : player2;
         cout << "   - " << player.getName() << endl;
     }
     cout << "--------------------------------------------------------" << endl
@@ -495,7 +447,7 @@ void Game::printStats()
     cout << "Round won:" << endl;
     for (int i = 0; i < NUM_PLAYERS; i++)
     {
-        Player player = (i == 0) ? player1 : player2;
+        player player = (i == 0) ? player1 : player2;
         cout << "   - " << player.getName() << " won " << player.getTurnsWon() << " rounds" << endl;
     }
     cout << "And there were " << player1.getTurnsDraw() << " ties!" << endl;
@@ -506,7 +458,9 @@ void Game::printStats()
     cout << "Cards left:" << endl;
     for (int i = 0; i < NUM_PLAYERS; i++)
     {
-        Player player = (i == 0) ? player1 : player2;
+        player player = (i == 0) ? player1 : player2;
+
+
         cout << "   - " << player.getName() << " has " << player.stacksize() << " cards left" << endl;
     }
     cout << "in the board card stack, there are " << board_stack.size() << " cards" << endl;
@@ -517,7 +471,7 @@ void Game::printStats()
     // Announce the final results
     for (int i = 0; i < NUM_PLAYERS; i++)
     {
-        Player player = (i == 0) ? player1 : player2;
+        player player = (i == 0) ? player1 : player2;
         cout << "   - " << player.getName() << " took " << player.cardesTaken() << " cards in total!" << endl;
     }
     cout << endl;
@@ -525,14 +479,14 @@ void Game::printStats()
          << endl;
 }
 
-// returning the log:
-std::string Game::getLog()
+// returningamee log:
+std::string game::getLog()
 {
     return mainLog;
 }
 
 // checking if the game is over- if one of the players has no cards or if pass 26 rounds:
-void Game::checkWin()
+void game::checkWin()
 {
     // if pass 26 round or one of the players has no cards
     if (roundsPlayed > 26 || player1.stacksize() == 0 || player2.stacksize() == 0)
@@ -599,7 +553,7 @@ void Game::checkWin()
 }
 
 // returning the number of rounds played:
-int Game::getRoundsPlayed() const
+int game::getRoundsPlayed() const
 {
     return roundsPlayed - 1;
 }
