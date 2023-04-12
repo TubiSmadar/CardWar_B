@@ -1,21 +1,21 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
-#include "card.hpp"
-#include "player.hpp"
+#include "Card.hpp"
+#include "Player.hpp"
 #include <vector>
 #include <string>
 #include <array>
 
 namespace ariel
 {
-    class game
+    class Game
     {
     private:
-        std::vector<card> board_stack;
-        std::array<player *, 2> players;
-        player &player1;
-        player &player2;
+        std::vector<Card> board_stack;
+        std::array<Player *, 2> players;
+        Player &player1;
+        Player &player2;
         std::string mainLog;
         std::string lastTurn;
 
@@ -29,17 +29,17 @@ namespace ariel
 
     public:
         // constructors:
-        game(player &first_player, player &second_player);
-        game();
-        game(game &&other) noexcept;
-        game(const game &other);
+        Game(Player &first_player, Player &second_player);
+        Game();
+        Game(Game &&other) noexcept;
+        Game(const Game &other);
 
         // destructor
-        ~game();
+        ~Game();
 
         // assignment operators
-        game &operator=(const game &other);
-        game &operator=(game &&other) noexcept;
+        Game &operator=(const Game &other);
+        Game &operator=(Game &&other) noexcept;
 
         //  methods:
         void playTurn();
@@ -50,7 +50,7 @@ namespace ariel
         void printStats();
         int getRoundsPlayed() const;
         std::string getLog();
-        const player &getWinner() const;
+        const Player &getWinner() const;
     };
 }
 
