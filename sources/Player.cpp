@@ -37,11 +37,11 @@ Player &Player::operator=(const Player &other)
             cards_stack = other.cards_stack;
             stats = other.stats;
         }
-        cout << "Player " << name << " was created!" << endl;
+        cout << "Player " << name << " is created!" << endl;
         return *this;
     }
-// third constructor - by name
-Player::Player(string name)
+
+    Player::Player(string name)
     {
         if (name.empty())
         {
@@ -95,28 +95,28 @@ string Player::getName() const
     return this->name;
 }
 
-// counting the turns that the player won and play
+// Counter for winner turn
 void Player::addTurnWon()
 {
     this->stats.turnsPlayed++;
     this->stats.turnsWon++;
 }
 
-// counting the turns that the player lost and play
+// Counter for loser turn
 void Player::addTurnLost()
 {
     this->stats.turnsPlayed++;
     this->stats.turnsLost++;
 }
 
-// counting the turns that the player draw and play
+// Counter for draw turn
 void Player::addTurnDraw()
 {
     this->stats.turnsPlayed++;
     this->stats.turnsDraw++;
 }
 
-// return the player's information
+// return the player's info
 string Player::getStats() const
 {
 
@@ -125,7 +125,7 @@ string Player::getStats() const
     statsStr += "Turns played: " + to_string(stats.turnsPlayed) + "\n";
     statsStr += "Turns won: " + to_string(stats.turnsWon) + "\n";
     statsStr += "Turns lost: " + to_string(stats.turnsLost) + "\n";
-    statsStr += "Turns draw: " + to_string(stats.turnsDraw) + "\n";
+    statsStr += "Draw turns: " + to_string(stats.turnsDraw) + "\n";
     return statsStr;
 }
 
@@ -136,25 +136,25 @@ int Player::stacksize() const
     return size;
 }
 
-// return the number of turns that the player won
+// Winner counter getter
 int Player::getTurnsWon() const
 {
     return stats.turnsWon;
 }
 
-// return the number of turns that the player lost
+// Loser counter getter
 int Player::getTurnsLost() const
 {
     return stats.turnsLost;
 }
 
-// return the number of turns that ended in a draw
+// Draw counter getter
 int Player::getTurnsDraw() const
 {
     return stats.turnsDraw;
 }
 
-// return the amount of cards this player has won.
+// Cards taken getter
 int Player::cardesTaken() const
 {
     return this->cards_taken.size();
