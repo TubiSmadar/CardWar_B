@@ -1,18 +1,18 @@
 #include <stdexcept>
-#include "player.hpp"
-#include "card.hpp"
+#include "Player.hpp"
+#include "Card.hpp"
 
 using namespace std;
 using namespace ariel;
 
     // copy constructor
-    player::player(const player &other)
+    Player::Player(const Player &other)
             : name(other.name), cards_stack(other.cards_stack), stats(other.stats), cards_taken(other.cards_taken)
     {
     }
 
 // Move assignment operator
-    player &player::operator=(player &&other) noexcept
+Player &Player::operator=(Player &&other) noexcept
         {
             if (this != &other)
                 {
@@ -24,12 +24,12 @@ using namespace ariel;
             return *this;
         }
 // Move constructor
-    player::player(player &&other) noexcept
+Player::Player(Player &&other) noexcept
         : name(other.name), cards_stack(other.cards_stack), stats(other.stats), cards_taken(other.cards_taken)
         {}
 
 // second constructor- deep copy constructor:
-    player &player::operator=(const player &other)
+Player &Player::operator=(const Player &other)
     {
         if (this != &other)
         {
@@ -41,7 +41,7 @@ using namespace ariel;
         return *this;
     }
 // third constructor - by name
-    player::player(string name)
+Player::Player(string name)
     {
         if (name.empty())
         {
@@ -49,29 +49,29 @@ using namespace ariel;
         }
 
         this->name = name;
-        this->cards_stack = vector<card>();
+        this->cards_stack = vector<Card>();
         this->stats = PlayerStats();
-        this->cards_taken = vector<card>();
+        this->cards_taken = vector<Card>();
         cout << "Player " << name << " is created!" << endl;
     }
 
 // destructor - delete the player when the game is over
-    player::~player()
+Player::~Player()
     {}
 
 // add cards to the player's cards_stack
-    void player::addTakenCard(const card &card)
+    void Player::addTakenCard(const Card &card)
         {
             cards_taken.push_back(card);
         }
-    void player::addCard(const card &card)
+    void Player::addCard(const Card &card)
         {
             this->cards_stack.push_back(card);
             cards_num++;
         }
 
 // return the card at the top of the player's stack
-    card player::playCard()
+Card Player::playCard()
         {
         // call check winner function
             if (cards_stack.empty())
@@ -79,45 +79,45 @@ using namespace ariel;
                     // Game over
                     throw invalid_argument("Player " + name + " has no more cards!");
                 }
-            card card = cards_stack.front();        // get the card from the top of the stack
+            Card card = cards_stack.front();        // get the card from the top of the stack
             cards_stack.erase(cards_stack.begin()); // remove the card from the stack
             return card;
         }
 
 // return the number of cards that the player has left
-int player::cardsLeft() const
+int Player::cardsLeft() const
 {
     return cards_stack.size();
 }
 
-string player::getName() const
+string Player::getName() const
 {
     return this->name;
 }
 
 // counting the turns that the player won and play
-void player::addTurnWon()
+void Player::addTurnWon()
 {
     this->stats.turnsPlayed++;
     this->stats.turnsWon++;
 }
 
 // counting the turns that the player lost and play
-void player::addTurnLost()
+void Player::addTurnLost()
 {
     this->stats.turnsPlayed++;
     this->stats.turnsLost++;
 }
 
 // counting the turns that the player draw and play
-void player::addTurnDraw()
+void Player::addTurnDraw()
 {
     this->stats.turnsPlayed++;
     this->stats.turnsDraw++;
 }
 
 // return the player's information
-string player::getStats() const
+string Player::getStats() const
 {
 
     string statsStr = "Player " + name + " stats:\n";
@@ -130,37 +130,37 @@ string player::getStats() const
 }
 
 // return the number of cards that the player has left
-int player::stacksize() const
+int Player::stacksize() const
 {
     int size = cards_stack.size();
     return size;
 }
 
 // return the number of turns that the player won
-int player::getTurnsWon() const
+int Player::getTurnsWon() const
 {
     return stats.turnsWon;
 }
 
 // return the number of turns that the player lost
-int player::getTurnsLost() const
+int Player::getTurnsLost() const
 {
     return stats.turnsLost;
 }
 
 // return the number of turns that ended in a draw
-int player::getTurnsDraw() const
+int Player::getTurnsDraw() const
 {
     return stats.turnsDraw;
 }
 
 // return the amount of cards this player has won.
-int player::cardesTaken() const
+int Player::cardesTaken() const
 {
     return this->cards_taken.size();
 }
 
-void player::printCardsStack() const
+void Player::printCardsStack() const
 {
     if (cards_stack.empty())
     {
@@ -168,7 +168,7 @@ void player::printCardsStack() const
         return;
     }
     cout << "Player " << name << " cards stack:" << endl;
-    for (std::vector<card>::size_type i = 0; i < cards_stack.size(); i++)
+    for (std::vector<Card>::size_type i = 0; i < cards_stack.size(); i++)
     {
         cout << cards_stack[i].toString() << endl;
     }
