@@ -1,65 +1,49 @@
+#ifndef PLAYER_HPP
+#define PLAYER_HPP
 
-#ifndef PLAYER_H
-#define PLAYER_H
-
-#include <string>
-#include <vector>
-
+#include <iostream>
+#include <string.h>
+#include<vector>
 #include "card.hpp"
+using namespace std;
 
-namespace ariel
-{
-    //got help from Maya Rom in this struct part
-    struct PlayerStats
-    {
-        // initializing the stats:
-        int cardsLeft = 0;
-        int turnsPlayed = 0;
-        int turnsWon = 0;
-        int turnsLost = 0;
-        int turnsDraw = 0;
-    };
-
+namespace ariel{
     class Player
     {
-    private:
-        std::vector<Card> cards_stack;
-        std::vector<Card> cards_taken;
-        PlayerStats stats;
-        std::string name;
-        int cards_num = 0;
+        private:
+            const string name;
+            int total_winning;
+            int in_play;
+            int cards_taken;
+            vector<Card> hand;
 
 
-    public:
-        // default constructor
-        Player() = default;
-        Player(const Player &other);
-        Player &operator=(const Player &other);
-        Player(std::string name);
-        void addCard(const Card &card);
-        void addTakenCard(const Card &card);
-        Card playCard();
-        int cardsLeft() const; // return the number of cards in the Player's deck
-        std::string getName() const;
-        void addTurnWon();
-        void addTurnLost();
-        void addTurnDraw();
-        std::string getStats() const;
-        int stacksize() const;
-        int getTurnsWon() const;
-        int getTurnsLost() const;
-        int getTurnsDraw() const;
-        int cardesTaken() const;
-        //print cards_stack
-        void printCardsStack() const;
-        //destructor
-        ~Player();
-
-        //Move constructor
-        Player(Player &&other) noexcept;
-
-        //Move assignment operator
-        Player &operator=(Player &&other) noexcept;
+        public:
+            //Constructors:
+            Player(string);
+            Player();
+            
+            //Destructor
+            ~Player();
+        
+            //Getters
+            string getName() const;
+            int stacksize() const;
+            int cardesTaken() const;
+            int getInPlay() const;
+            int getTotalWinnings() const;
+            
+            //Setters
+            void addToTotalWinnings();
+            void setInPlay(int);
+            void setCardsTaken(int);
+        
+            //Methods
+            void withdrawCard(Card&);
+            Card playCard();
+        
+            //Operator
+            bool operator==(const Player& other) const;
     };
 }
 
