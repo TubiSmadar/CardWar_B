@@ -11,12 +11,14 @@ namespace ariel{
     class Game
     {
         private:
+            //Fields
             Player *player1;
             Player *player2;
             vector<Card> deck;
             vector<string> log;
             int draws;
             int  turns;
+            //Added methods
             void shuffleDeck();
             void dealCards();
             void generateGame();
@@ -25,7 +27,7 @@ namespace ariel{
         public:
             //Constructors
             Game(Player&, Player&);
-
+            //Inner methods
             void playTurn();
             void printLastTurn();
             void playAll();
