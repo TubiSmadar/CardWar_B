@@ -25,7 +25,6 @@ namespace ariel{
         public:
             //Constructors
             Game(Player&, Player&);
-            ~Game();
 
             void playTurn();
             void printLastTurn();
