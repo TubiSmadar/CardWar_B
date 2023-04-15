@@ -69,5 +69,4 @@ namespace ariel{
 
     Card::Card() : value(6), symbol("Clubs"){}
     
-    Card::~Card() {}
 }
