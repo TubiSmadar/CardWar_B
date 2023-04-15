@@ -1,550 +1,212 @@
-#include "card.hpp"
-#include "player.hpp"
-#include <algorithm>
-#include <iostream>
+#include<algorithm>
+#include<ctime>
 #include <random>
-#include <string>
 #include "game.hpp"
-#include <iomanip>
 
 using namespace std;
 
-namespace ariel
-{
-    // constructors:
-    //player c'tor
-    Game::Game(Player &first_player, Player &second_player) : winner(-1), player1(first_player), player2(second_player)
-    {
+namespace ariel{
 
-        this->roundsPlayed = 0;
-        cout <<"preparing the game...\n"
-             << endl;
-        // fill the middle stack with cards
-        for (int rank = 1; rank < 14; rank++)
-        {
-            for (int suit = 0; suit < 4; suit++)
-            {
-                Suit cardSuit = static_cast<Suit>(suit);
-                Rank cardRank = static_cast<Rank>(rank);
-                Card card(cardRank, cardSuit);
-                board_stack.push_back(card);
+    void Game::shuffleDeck(){
+        random_device rd;
+        mt19937 g(rd());
+        std::shuffle(this->deck.begin(), this->deck.end(), g);
+    }
+
+    void Game::dealCards(){
+        for(uint i = 0; i < this->deck.size(); i++){
+            this->player1->withdrawCard(this->deck.at(i++));
+            this->player2->withdrawCard(this->deck.at(i));
+        }
+        this->deck.clear();
+        this->deck.shrink_to_fit();
+    }
+
+    void Game::generateGame(){
+        int num[13] = {1,2,3,4,5,6,7,8,9,10,11,12,13};
+        string type[4] = {"Clubs", "Hearts", "Diamonds", "Spades"};
+        
+        for(int i = 0; i < 13; i++){
+            for(int j = 0; j < 4; j++){
+                this->deck.push_back(Card(num[i], type[j]));
+            }
+        }
+        this->player1->setInPlay(true);
+        this->player2->setInPlay(true);
+        shuffleDeck();
+        dealCards();
+    }
+
+   string Game::setLogString(string name1, Card card1, string name2, Card card2, int flag) {
+        string msg = name1 + " played " + card1.toString() + " " + name2 + " played " + card2.toString() + ". ";
+
+        if (flag == 0) {
+            return msg + "Draw.";
+        } else if (flag == 1) {
+            return msg + name1 + " wins.";
+        } else {
+            return msg + name2 + " wins.";
+        }
+    }
+
+int Game::play(string* document, int* cards_won, int* winner){
+    if (this->player1->stacksize() == 0 || this->player2->stacksize() == 0){
+        this->player1->setInPlay(0);
+        this->player2->setInPlay(0);
+        return 0;
+    }
+
+    Card player1_card = this->player1->playCard();
+    Card player2_card = this->player2->playCard();
+    string player1_name = this->player1->getName();
+    string player2_name = this->player2->getName();
+    *(cards_won) += 2;
+
+    if (player1_card == player2_card) {
+        *(document) += setLogString(player1_name, player1_card, player2_name, player2_card, 0);
+        this->draws++;
+
+        if (this->player1->stacksize() != 0 && this->player2->stacksize() != 0) {
+            this->player1->playCard();
+            this->player2->playCard();
+            *(cards_won) += 2;
+        }
+        return 1;
+    }
+    else if (player1_card > player2_card) {
+        *(document) += setLogString(player1_name, player1_card, player2_name, player2_card, 1);
+        this->player1->setCardsTaken(*(cards_won));
+        this->player1->addToTotalWinnings();
+        *(winner) = 1;
+        return 0;
+    }
+    else {
+        *(document) += setLogString(player1_name, player1_card, player2_name, player2_card, 2);
+        this->player2->setCardsTaken(*(cards_won));
+        this->player2->addToTotalWinnings();
+        *(winner) = 2;
+        return 0;
+    }
+    return 1;
+}
+
+    Game::Game(Player& pl1, Player& pl2){
+        if(pl1.getInPlay() != 0){
+            throw new invalid_argument("player 1 is in a game!");
+        }
+
+        if(pl2.getInPlay() != 0){
+            throw new invalid_argument("player 2 is in a game!");
+        }
+
+        this->player1 = &pl1;
+        this->player2 = &pl2;
+        this->deck = {};
+        this->log = {};
+        this->draws = 0;
+        this->turns = 0;
+        this->generateGame();
+    }
+
+    void Game::playTurn(){
+        if(this->player1 == this->player2){
+            throw new invalid_argument("Play with friends please!");
+        }
+
+        int turnWinner = 0;
+        string turnDocument = "";
+        int cardsWon = 0;
+
+        if(this->turns >=26){
+            throw new invalid_argument("Game ended");
+        }
+
+        bool turnFinished = false;
+        while (!turnFinished) {
+            this->turns++;
+
+            int result = play(&turnDocument, &cardsWon, &turnWinner);
+
+            if (result == 0) {
+                // A player has won the turn
+                turnFinished = true;
+                string winnerName = (turnWinner == 1) ? this->player1->getName() : this->player2->getName();
+                cout << winnerName << " wins the turn!" << endl;
+            } else if (result == 1) {
+                // A draw occurred
+                cout << "Draw!" << endl;
             }
         }
 
-        // shuffle
-        cout << "Shuffling the cards...\n";
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::shuffle(std::begin(board_stack), std::end(board_stack), gen);
-        cout << "Dealing the cards...\n";
 
-        // split cards
-        players[0] = &first_player;
-        players[1] = &second_player;
+        this->log.push_back(turnDocument);
 
-        int i = 0;
-        while (i < board_stack.size())
-        {
-            players[0]->addCard(board_stack[(unsigned int)i]);
-            players[1]->addCard(board_stack[(unsigned int)i + 1]);
-            i+=2;
-        }
-        // clear the middle stack
-        board_stack.clear();
-        cout << "--------------------  The game is ready  ------------------------\n";
-    }
-
-    //  default constructor
-    Game::Game() : winner(-1), player1(*new Player("player1")), player2(*new Player("player2")) {}
-
-    // move assignment operator (rvalue reference)
-    Game &Game::operator=(Game &&other) noexcept
-{
-    if (this != &other)
-    {
-        board_stack = std::move(other.board_stack);
-        players[0] = std::move(other.players[1]);
-        players[1] = std::move(other.players[2]);
-        mainLog = std::move(other.mainLog);
-        lastTurn = std::move(other.lastTurn);
-        winner = other.winner;
-        roundsPlayed = other.roundsPlayed;
-    }
-    return *this;
-}
-// Move constructor
-    Game::Game(Game &&other) noexcept
-        : board_stack(std::move(other.board_stack)),
-        players(std::move(other.players)),
-        player1(other.player1),
-        player2(other.player2),
-        mainLog(std::move(other.mainLog)),
-        lastTurn(std::move(other.lastTurn)),
-        winner(other.winner),
-        roundsPlayed(other.roundsPlayed) {}
-// Copy constructor
-    Game::Game(const Game &other)
-        : board_stack(other.board_stack),
-          player1(*other.players[0]),
-          player2(*other.players[1]),
-          mainLog(other.mainLog),
-          lastTurn(other.lastTurn),
-          winner(other.winner),
-          roundsPlayed(other.roundsPlayed)
-        {
-            players = {&player1, &player2};
-        }
-// Copy assignment operator
-    Game &Game::operator=(const Game &other)
-    {
-        if (this != &other)
-        {
-            board_stack = other.board_stack;
-            player1 = *other.players[0];
-            player2 = *other.players[1];
-            mainLog = other.mainLog;
-            lastTurn = other.lastTurn;
-            winner = other.winner;
-            roundsPlayed = other.roundsPlayed;
-            players = {&player1, &player2};
-        }
-        return *this;
-    }
-
-// destructor:
-    Game::~Game() {}
-
-// creating the cards and filling the middle_stack
-void Game::fillCards()
-{
-    for (int rank = 1; rank <= 13; rank++)
-    {
-        for (int suit = 0; suit < 4; suit++)
-        {
-            Card card(static_cast<Rank>(rank), static_cast<Suit>(suit));
-            board_stack.push_back(card);
+        if(!turnWinner){
+            this->player1->setCardsTaken(cardsWon / 2);
+            this->player2->setCardsTaken(cardsWon / 2);
         }
     }
-}
 
-// shuffling the cards:
-void Game::shuffleDeck()
-{
-
-    random_device rd;
-    mt19937 g(rd());
-    shuffle(this->board_stack.begin(), this->board_stack.end(), g);
-}
-
-// splitting the cards between the players:
-void Game::splitCards()
-{
-    for (unsigned int i = 0; i < 52; i++)
-    {
-        if (i % 2 == 0)
-        {
-            player1.addCard(board_stack[(unsigned int)i]);
+    void Game::printLastTurn(){
+        if(this->log.size() == 0){
+            throw new logic_error("Turn log is empty!");
         }
-        else
-        {
-            player2.addCard(board_stack[(unsigned int)i]);
-        }
+        cout << this->log.back() << endl;
     }
-}
-void Game::playAll()
-{
-    std::cout << "Each player has: " << player1.stacksize() << " cards" << std::endl;
-    std::cout << "In the middle stack there are:  " << board_stack.size() << " cards" << std::endl;
-    while (winner == -1 && roundsPlayed < 27)
-    {
 
-        playTurn();
-        checkWin();
-    }
-    checkWin();
-}
-
-// playing a turn:
-void Game::playTurn()
-{
-
-    // error
-    if (player1.getName() == player2.getName())
-    {
-        throw std::invalid_argument("Players cannot have the same name!");
-    }
-    roundsPlayed++;
-
-    // print the turn number
-    std::cout << "Turn number: " << roundsPlayed << std::endl;
-    std::cout << "\n";
-    checkWin();
-
-    // every player put in the board stack the card
-    board_stack.push_back(player1.playCard());
-    board_stack.push_back(player2.playCard());
-
-    // print the cards
-    std::cout << player1.getName() << " card:   " << board_stack[board_stack.size()-2].toString() << "\n" <<player2.getName() << " card: " << board_stack[board_stack.size()-1].toString() << std::endl;
-
-
-
-    // select turn winner
-    if (board_stack[board_stack.size() - 2].compare(board_stack[board_stack.size() - 1]) > 0) // player1 wins
-    {
-        player1.addTurnWon();
-        player2.addTurnLost();
-        mainLog += player1.getName() + " played " + board_stack[board_stack.size() - 1].toString() + "\n" + player2.getName() + " played " + board_stack[board_stack.size() - 2].toString() + " - " + player1.getName() + " won the turn" + "\n\n";
-
-        // Display the winner of the turn
-        std::cout << "Winner of the turn: " << player1.getName() << std::endl;
-
-        // add the cards to the winner
-        for (int i = 0; i < board_stack.size(); i++)
-        {
-            player1.addTakenCard(board_stack[(unsigned int)i]);
-        }
-
-        checkWin();
-        // clear the middle stack
-        board_stack.clear();
-        // go back to the beginning of the function
-        return;
-    }
-    else if (board_stack[board_stack.size() - 2].compare(board_stack[board_stack.size() - 1]) < 0) // player1 wins // player2 wins
-    {
-        player2.addTurnWon();
-        // print the winner of the turn
-        // Display the winner of the turn
-        mainLog += player1.getName() + " played: " + board_stack[board_stack.size() - 1].toString() + "\n" + player2.getName() + " played: " + board_stack[board_stack.size() - 1].toString() + "\n" + player2.getName() + " won the turn" + "\n\n";
-
-        std::cout << "Winner of the turn: " << player2.getName() << std::endl;
-
-        // add the cards to the winner
-        for (int i = 0; i < board_stack.size(); i++)
-        {
-            player2.addTakenCard(board_stack[(unsigned int)i]);
-        }
-
-        checkWin();
-        // clear the middle stack
-        board_stack.clear();
-        // go back to the beginning of the function
-        return;
-    }
-    // if the cards are equal - war
-    {
-        checkWin();
-        // update the draw counter
-        player1.addTurnDraw();
-        player2.addTurnDraw();
-        mainLog += player1.getName() + " played " + board_stack[board_stack.size() - 1].toString() + "\n" + player2.getName() + " played " + board_stack[board_stack.size() - 1].toString() + " - " + "WAR" + "\n\n";
-
-        // tie_war();
-        std::cout << "Tie!!!!!!\n";
-        // declare the cards
-        int tie_seq = 1;
-        roundsPlayed++;
-
-        while (roundsPlayed <= 26 && player1.stacksize() > 0 && player2.stacksize() > 0)
-        {
-
-            // print the turn number
-            std::cout << "Turn number: " << roundsPlayed << std::endl;
-            // print the tie sequence
-            std::cout << "Tie sequence: " << tie_seq << std::endl;
-
-            // every player put in the middle stack two cards
-
-            for (int i = 0; i < 2; i++)
-            {
-                if (player1.stacksize() == 0 || player2.stacksize() == 0)
-                {
-                    while (board_stack.size() > 0)
-                    {
-                        player1.addTakenCard(board_stack[board_stack.size() - 1]);
-                        board_stack.pop_back();
-                        player2.addTakenCard(board_stack[board_stack.size() - 1]);
-                        board_stack.pop_back();
-                    }
-                    break;
-                }
-                board_stack.push_back(player1.playCard());
-                board_stack.push_back(player2.playCard());
+    void Game::playAll(){
+        while(this->player1->getInPlay() != 0 || this->player2->getInPlay() != 0){
+            if(this->turns < 26){
+                this->playTurn();
             }
-
-
-            // declare who wins the turn
-            // if player1 wins
-            if (board_stack[board_stack.size() - 2].compare(board_stack[board_stack.size() - 1]) > 0)
-            {
-                player1.addTurnWon();
-
-                // Display the winner of the turn
-                std::cout << "Winner of the turn: " << player1.getName() << std::endl;
-
-                for (int i = 0; i < board_stack.size(); i++)
-                {
-                    player1.addTakenCard(board_stack[static_cast<std::vector<Card>::size_type>(i)]);
-                }
-                board_stack.clear();
-                mainLog += player1.getName() + " played " + board_stack[board_stack.size() - 2].toString() + "\n" + player2.getName() + " played " + board_stack[board_stack.size() - 1].toString() + " - " + player1.getName() + " won the turn" + "\n\n";
-                checkWin();
+            else{
                 break;
             }
-
-                // the winner of the turn is player2
-            else if (board_stack[board_stack.size() - 2].compare(board_stack[board_stack.size() - 1]) < 0)
-            {
-                player2.addTurnWon();
-                // print the winner of the turn
-                // Display the winner of the turn
-                std::cout << "Winner of the turn: " << player2.getName() << std::endl;
-
-                for (int i = 0; i < board_stack.size(); i++)
-                {
-                    player2.addTakenCard(board_stack[static_cast<std::vector<Card>::size_type>(i)]);
-                }
-                board_stack.clear();
-                mainLog += player1.getName() + " played " + board_stack[board_stack.size() - 2].toString() + "\n" + player2.getName() + " played " + board_stack[board_stack.size() - 1].toString() + " - " + player2.getName() + " won the turn" + "\n\n";
-                checkWin();
-                break;
-            }
-            else // if the cards are equal - continue
-            {
-                checkWin();
-
-                // update the draw counter
-                player1.addTurnDraw();
-                player2.addTurnDraw();
-                mainLog += player1.getName() + " played " + board_stack[board_stack.size() - 2].toString() + "\n" + player2.getName() + " played " + board_stack[board_stack.size() - 1].toString() + " - " + "WAR" + "\n\n";
-
-                tie_seq++;
-            }
         }
 
-        // if the game ends in a tie, return
-        if (roundsPlayed == 26 && player1.stacksize() > 0 && player2.stacksize() > 0)
-        {
-            std::cout << "The game ended in a tie!" << std::endl;
-            checkWin();
+        if(this->turns != 26){
+            this->turns = 26;
         }
     }
-}
-void Game::printLastTurn()
-{
-    if (roundsPlayed == 0)
-    {
-        std::cout << "No turns have been played yet." << std::endl;
-    }
-    else
-    {
-        // print last turn
-        std::cout << "Turn number: " << roundsPlayed << std::endl;
-        cout << lastTurn << endl;
-    }
-}
-void Game::printWiner()
-{
-    if (player1.stacksize() == 0 || player2.stacksize() == 0 || roundsPlayed == 26)
-    {
 
-        if (player1.cardesTaken() > player2.cardesTaken())
-        {
-            std::cout << "The winner is: \n";
-            std::cout << "             *** " << player1.getName() << " ***\n" << std::endl;
-
-        }
-        else if (player1.cardesTaken() < player2.cardesTaken())
-        {
-            std::cout << "The winner is: \n";
-            std::cout << "             *** " << player2.getName() << " ***\n" << std::endl;
-        }
-        else
-        {
-            std::cout << "The game ended in a tie!" << std::endl;
+    void Game::printWiner(){
+        if (this->player1->getTotalWinnings() > this->player2->getTotalWinnings()) {
+            cout << this->player1->getName() << " won the match!" << endl;
+        } else if (this->player1->getTotalWinnings() < this->player2->getTotalWinnings()) {
+            cout << this->player2->getName() << " won the match!" << endl;
+        } else {
+            cout << "The match ended in a draw!" << endl;
         }
     }
-    else
-    {
-        std::cout << "No winner declared yet!" << std::endl;
-    }
-}
 
-// printing the log:
-void Game::printLog()
-{
-    if (mainLog.empty())
-    {
-        std::cout << "No log entries to print." << std::endl;
-        return;
-    }
-
-    std::cout << "Game log: \n";
-    std::cout << std::endl
-              << mainLog;
-}
-
-// Member function to get the winner
-const Player &Game::getWinner() const
-{
-    if (winner == 1)
-    {
-        return *players[0];
-    }
-    else if (winner == 2)
-    {
-        return *players[1];
-    }
-    else
-    {
-        throw std::logic_error("No winner yet!");
-    }
-}
-
-void Game::printStats()
-{
-
-    const int NUM_PLAYERS = 2;
-    std::cout << "game statistics: \n";
-    std::cout << std::endl;
-
-    if (board_stack.size() > 0)
-    {
-        // divide it between the players
-        while(board_stack.size() > 0)
-        {
-            player1.addTakenCard(board_stack[board_stack.size() - 1]);
-            if (board_stack.size() >= 1)
-                player2.addTakenCard(board_stack[board_stack.size() - 2]);
+    void Game::printLog(){
+        if(this->log.size() == 0){
+            throw new logic_error("Game log is empty!");
         }
 
-        board_stack.clear();
-    }
-
-    // Introduce the players
-    cout << "Players played: " << endl;
-    for (int i = 0; i < NUM_PLAYERS; i++)
-    {
-        Player player = (i == 0) ? player1 : player2;
-        cout << "   - " << player.getName() << endl;
-    }
-    cout << "********************************************************" << endl
-         << endl;
-
-    // Reveal the rounds results
-    cout << "Round won:" << endl;
-    for (int i = 0; i < NUM_PLAYERS; i++)
-    {
-        Player player = (i == 0) ? player1 : player2;
-        cout << "   - " << player.getName() << " won " << player.getTurnsWon() << " rounds" << endl;
-    }
-    cout << "And there were " << player1.getTurnsDraw() << " ties!" << endl;
-    cout << "********************************************************" << endl
-         << endl;
-
-    // Display the remaining cards
-    cout << "Cards left:" << endl;
-    for (int i = 0; i < NUM_PLAYERS; i++)
-    {
-        Player player = (i == 0) ? player1 : player2;
-
-
-        cout << "   - " << player.getName() << " has " << player.stacksize() << " cards left" << endl;
-    }
-    cout << "in the board card stack, there are " << board_stack.size() << " cards" << endl;
-
-    cout << "********************************************************" << endl
-         << endl;
-
-    // Announce the final results
-    for (int i = 0; i < NUM_PLAYERS; i++)
-    {
-        Player player = (i == 0) ? player1 : player2;
-        cout << "   - " << player.getName() << " took " << player.cardesTaken() << " cards in total!" << endl;
-    }
-    cout << endl;
-    cout << "********************************************************" << endl
-         << endl;
-}
-
-// return game log:
-std::string Game::getLog()
-{
-    return mainLog;
-}
-
-// checking if the game is over- if one of the players has no cards or if pass 26 rounds:
-void Game::checkWin()
-{
-    // if pass 26 round or one of the players has no cards
-    if (roundsPlayed > 26 || player1.stacksize() == 0 || player2.stacksize() == 0)
-    {
-        if (board_stack.size() > 0)
-        {
-
-            if (player1.cardesTaken() + player2.cardesTaken() < 52)
-            {
-                // divide it between the players
-                while (board_stack.size()>0 )
-                {
-                    player1.addTakenCard(board_stack[board_stack.size() - 1]);
-                    if (board_stack.size() >= 1)
-                        player2.addTakenCard(board_stack[board_stack.size() - 2]);
-                }
-            }
-            board_stack.clear();
-        }
-        {
-            // divide it between the players
-            while (board_stack.size()>0 )
-            {
-                player1.addTakenCard(board_stack[board_stack.size() - 1]);
-                if (board_stack.size() >= 1)
-                    player2.addTakenCard(board_stack[board_stack.size() - 2]);
-            }
-            board_stack.clear();
-        }
-        // print line
-        cout << "********************************************************" << endl;
-        cout << "*** The game is over ***" << endl;
-
-        // print every player's cards
-        cout << "Player 1 cards taken: " << player1.cardesTaken() << endl;
-        player1.cardesTaken();
-        cout << "Player 2 cards taken: " << player2.cardesTaken() << endl;
-        // print the middle cards
-        cout << "Board cards: " << board_stack.size() << endl;
-        cout << "********************************************************" << endl;
-
-        if (player1.cardesTaken() > player2.cardesTaken())
-        {
-            winner = 0;
-            printWiner();
-        }
-        else if (player1.cardesTaken() < player2.cardesTaken())
-        {
-            winner = 1;
-            printWiner();
-        }
-        else
-        {
-            winner = 5;
-            printWiner();
+        for(uint i = 0; i < this->log.size(); i++){
+            cout << this->log.at(i) << endl;
         }
     }
-        // if no winner yet
-    else
-    {
-        winner = -1;
-        return;
+
+    void Game::printStats(){
+        cout << "-----------------------------------------------------------------------------------------------------------" << endl;
+        cout << "PLAYER NAME: " << this->player1->getName() << endl;
+        cout << "CARDS WON: " << this->player1->cardesTaken() << endl;
+        cout << "CARDS LEFT IN PILE: " << this->player1->stacksize() << endl;
+        cout << "TOTAL WINS: " << this->player1->getTotalWinnings() << endl;
+        cout << "TURNS: " << this->turns << endl;
+        cout << "WIN RATE: " <<  float(this->player1->getTotalWinnings()) / float(this->turns) << "%" << endl;
+        cout << "-----------------------------------------------------------------------------------------------------------" << endl;
+        cout << "PLAYER NAME: " << this->player2->getName() << endl;
+        cout << "CARDS WON: " << this->player2->cardesTaken() << endl;
+        cout << "CARDS LEFT IN PILE: " << this->player2->stacksize() << endl;
+        cout << "TOTAL WINS: " << this->player2->getTotalWinnings() << endl;
+        cout << "TURNS: " << this->turns << endl;
+        cout << "WIN RATE: " << float(this->player2->getTotalWinnings()) / float(this->turns) << "%" << endl;
+        cout << "-----------------------------------------------------------------------------------------------------------" << endl;
+        cout << "TOTAL TURNS PLAYED: " << this->turns << endl;
+        cout << "TOTAL DRAWS MADE: " << this->draws << endl;
+        cout << "DRAWS RATE: " << float(this->draws) / float(this->turns) << "%" << endl << endl;
     }
-}
-
-// returning the number of rounds played:
-int Game::getRoundsPlayed() const
-{
-    return roundsPlayed - 1;
-}
-
 }
