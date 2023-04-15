@@ -107,6 +107,8 @@ int Game::play(string* document, int* cards_won, int* winner){
         this->turns = 0;
         this->generateGame();
     }
+    
+    Game::~Game() {}
 
     void Game::playTurn(){
         if(this->player1 == this->player2){
