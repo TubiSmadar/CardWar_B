@@ -16,7 +16,6 @@ namespace ariel{
             //Constructors
             Card(int value, const string& symbol);
             Card();
-            ~Card();
             
             //Operators
             bool operator==(const Card&) const;
