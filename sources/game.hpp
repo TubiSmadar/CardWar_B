@@ -1,56 +1,37 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
-#include "card.hpp"
-#include "player.hpp"
+#include <iostream>
 #include <vector>
-#include <string>
-#include <array>
+#include "player.hpp"
+#include "card.hpp"
+using namespace std;
 
-namespace ariel
-{
+namespace ariel{
     class Game
     {
-    private:
-        std::vector<Card> board_stack;
-        std::array<Player *, 2> players;
-        Player &player1;
-        Player &player2;
-        std::string mainLog;
-        std::string lastTurn;
+        private:
+            Player *player1;
+            Player *player2;
+            vector<Card> deck;
+            vector<string> log;
+            int draws;
+            int  turns;
+            void shuffleDeck();
+            void dealCards();
+            void generateGame();
+            int play(string*, int*, int*);
+            string setLogString(string, Card, string, Card, int);
+        public:
+            //Constructors
+            Game(Player&, Player&);
 
-        int winner;
-        int roundsPlayed;
-        void fillCards();
-        void shuffleDeck();
-        void splitCards();
-        void checkWin();
-        void tie_war();
-
-    public:
-        // constructors:
-        Game(Player &first_player, Player &second_player);
-        Game();
-        Game(Game &&other) noexcept;
-        Game(const Game &other);
-
-        // destructor
-        ~Game();
-
-        // assignment operators
-        Game &operator=(const Game &other);
-        Game &operator=(Game &&other) noexcept;
-
-        //  methods:
-        void playTurn();
-        void playAll();
-        void printLastTurn();
-        void printWiner();
-        void printLog();
-        void printStats();
-        int getRoundsPlayed() const;
-        std::string getLog();
-        const Player &getWinner() const;
+            void playTurn();
+            void printLastTurn();
+            void playAll();
+            void printWiner();
+            void printLog();
+            void printStats();
     };
 }
 
