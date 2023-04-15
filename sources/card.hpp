@@ -1,83 +1,30 @@
-
 #ifndef CARD_HPP
 #define CARD_HPP
 
 #include <iostream>
 #include <string>
+using namespace std;
 
-namespace ariel
-{
-    enum class Rank
-    {
-        ACE = 1,
-        TWO,
-        THREE,
-        FOUR,
-        FIVE,
-        SIX,
-        SEVEN,
-        EIGHT,
-        NINE,
-        TEN,
-        JACK,
-        QUEEN,
-        KING,
-        NO_RANK
-    };
-
-    enum class Suit
-    {
-        HEARTS,
-        SPADES,
-        DIAMONDS,
-        CLUBS
-    };
-
+namespace ariel{
     class Card
     {
-    public:
-        Card();
+        private:
+            int value;
+            string symbol;
+            
+        public:
+            //Constructors
+            Card(int value, const string& symbol);
+            Card();
+            
+            //Operators
+            bool operator==(const Card&) const;
+            bool operator>(const Card&) const;
 
-        //Constructor
-        Card(Rank rank, Suit suit);
-
-        //Copy constructor
-        Card(const Card &other) noexcept;
-
-        //Move constructor
-        Card(Card &&other) noexcept;
-
-        //Copy assignment operator
-        Card &operator=(const Card &other) noexcept;
-
-        //Move assignment operator
-        Card &operator=(Card &&other) noexcept;
-
-        //Destructor
-        ~Card();
-
-        //Returns a string representation of the Card
-        std::string toString() const;
-
-        //Compare method
-        int compare(const Card &other) const;
-
-        //Getters
-        Rank getRank() const { return rank; }
-        Suit getSuit() const { return suit; }
-
-        //Setters
-        void setRank(Rank rank) { this->rank = rank; }
-        void setSuit(Suit suit) { this->suit = suit; }
-
-        //Static methods
-        static std::string suitToString(Suit suit);
-        static std::string rankToString(Rank rank);
-
-    private:
-        Rank rank;
-        Suit suit;
+            //Methods
+            string toString();
     };
-}
+    
+} 
 
 #endif
