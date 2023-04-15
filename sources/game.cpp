@@ -191,22 +191,20 @@ int Game::play(string* document, int* cards_won, int* winner){
 
     void Game::printStats(){
         cout << "-----------------------------------------------------------------------------------------------------------\n" << endl;
-        cout << "PLAYER NAME: " << this->player1->getName() << endl;
-        cout << "CARDS WON: " << this->player1->cardesTaken() << endl;
-        cout << "CARDS LEFT IN PILE: " << this->player1->stacksize() << endl;
-        cout << "TOTAL WINS: " << this->player1->getTotalWinnings() << endl;
-        cout << "TURNS: " << this->turns << endl;
-        cout << "WIN RATE: " <<  float(this->player1->getTotalWinnings()) / float(this->turns) << "%" << endl;
+        cout << "Player name: " << this->player1->getName() << endl;
+        cout << "Cards gained " << this->player1->cardesTaken() << endl;
+        cout << "Cards left: " << this->player1->stacksize() << endl;
+        cout << "Total winnings: " << this->player1->getTotalWinnings() << endl;
+        cout << "Turns played: " << this->turns << endl;
+        cout << "Win rate: " <<  float(this->player1->getTotalWinnings()) / float(this->turns) << "%" << endl;
         cout << "-----------------------------------------------------------------------------------------------------------\n" << endl;
-        cout << "PLAYER NAME: " << this->player2->getName() << endl;
-        cout << "CARDS WON: " << this->player2->cardesTaken() << endl;
-        cout << "CARDS LEFT IN PILE: " << this->player2->stacksize() << endl;
-        cout << "TOTAL WINS: " << this->player2->getTotalWinnings() << endl;
-        cout << "TURNS: " << this->turns << endl;
-        cout << "WIN RATE: " << float(this->player2->getTotalWinnings()) / float(this->turns) << "%" << endl;
+        cout << "Player name: " << this->player2->getName() << endl;
+        cout << "Cards gained " << this->player2->cardesTaken() << endl;
+        cout << "Cards left: " << this->player2->stacksize() << endl;
+        cout << "Total winnings: " << this->player2->getTotalWinnings() << endl;
+        cout << "Turns played: " << this->turns << endl;
+        cout << "Win rate: " << float(this->player2->getTotalWinnings()) / float(this->turns) << "%" << endl;
         cout << "-----------------------------------------------------------------------------------------------------------\n" << endl;
-        cout << "TOTAL TURNS PLAYED: " << this->turns << endl;
-        cout << "TOTAL DRAWS MADE: " << this->draws << endl;
-        cout << "DRAWS RATE: " << float(this->draws) / float(this->turns) << "%" << endl << endl;
+        cout << "Total draws: " << this->draws << endl;
     }
 }
