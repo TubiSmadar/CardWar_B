@@ -73,4 +73,6 @@ Player::Player() {
     this->hand = {};
     this->cards_taken = 0;
 }
+Player::~Player() {}
+        
 }
