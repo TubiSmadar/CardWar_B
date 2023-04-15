@@ -22,9 +22,6 @@ namespace ariel{
             //Constructors:
             Player(string);
             Player();
-            
-            //Destructor
-            ~Player();
         
             //Getters
             string getName() const;
