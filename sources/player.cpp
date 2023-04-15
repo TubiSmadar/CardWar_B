@@ -63,16 +63,11 @@ namespace ariel{
         this->cards_taken = 0;
     }
 
-Player::Player() {
-    static int player_number = 0;
-    player_number++;
-    this->name = "player_" + to_string(player_number);
-
-    this->total_winning = 0;
-    this->in_play = 0;
-    this->hand = {};
-    this->cards_taken = 0;
-}
-Player::~Player() {}
+    Player::Player() : name("no_name"){
+        this->total_winning = 0;
+        this->in_play = 0;
+        this->hand = {};
+        this->cards_taken = 0;
+    }
         
 }
